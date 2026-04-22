@@ -1,4 +1,4 @@
 package org.example.domain;
 
-public record Money() {
+public record Money(double unitPrice) {
 }

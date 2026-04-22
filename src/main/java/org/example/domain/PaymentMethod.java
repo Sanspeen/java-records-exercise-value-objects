@@ -1,4 +1,4 @@
 package org.example.domain;
 
-public record PaymentMethod() {
+public record PaymentMethod(PaymentMethods paymentMethod) {
 }

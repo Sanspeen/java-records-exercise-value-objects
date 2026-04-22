@@ -1,4 +1,4 @@
 package org.example.domain;
 
-public record ProductId() {
+public record ProductId(String productId) {
 }

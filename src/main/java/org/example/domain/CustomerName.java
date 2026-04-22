@@ -1,4 +1,4 @@
 package org.example.domain;
 
-public record CustomerName() {
+public record CustomerName(String name) {
 }

@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.domain.PaymentMethods;
 import org.example.dto.OrderItemRequest;
 import org.example.service.OrderService;
 
@@ -19,7 +20,7 @@ public class Main {
                 "New york",
                 "Colombia",
                 items,
-                "Credit card"
+                PaymentMethods.PSE
         );
         System.out.println();
         orderService.createOrder(orderServiceRequest);

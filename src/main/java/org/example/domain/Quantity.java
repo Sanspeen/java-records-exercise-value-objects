@@ -1,4 +1,4 @@
 package org.example.domain;
 
-public record Quantity() {
+public record Quantity(int quantity) {
 }
