@@ -1,7 +1,6 @@
-package org.example;
+package org.example.dto;
 
 import org.example.domain.PaymentMethods;
-import org.example.dto.OrderItemRequest;
 
 import java.util.List;
 

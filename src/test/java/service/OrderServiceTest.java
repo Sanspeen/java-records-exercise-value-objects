@@ -1,6 +1,6 @@
 package service;
 
-import org.example.CreateOrderRequest;
+import org.example.dto.CreateOrderRequest;
 import org.example.domain.*;
 import org.example.dto.CreateOrderResponse;
 import org.example.dto.OrderItemRequest;
@@ -10,14 +10,19 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 class OrderServiceTest {
 
     OrderService orderService = new OrderService();
 
     @Test
-    public void shouldCreateOrderSuccessfully(){
-        List<OrderItemRequest> items = List.of(new OrderItemRequest("id-1", 2, 1200), new OrderItemRequest("id-2", 1, 2000));
+    public void shouldCreateOrderSuccessfully() {
+        List<OrderItemRequest> items = List.of(
+                new OrderItemRequest("id-1", 2, 1200),
+                new OrderItemRequest("id-2", 1, 2000)
+        );
+
         CreateOrderRequest orderServiceRequest = new CreateOrderRequest(
                 "Santiago Franco",
                 "santiago@gmail.com",
@@ -41,23 +46,56 @@ class OrderServiceTest {
                 )
         );
 
-        CreateOrderResponse expectedOrderResponse = new CreateOrderResponse(
-                new CustomerName("Santiago"),
-                new EmailAddress(),
-                new Address(),
-                itemsValueObject,
-                new PaymentMethod(PaymentMethods.CARD)
-        );
+        double subtotal = (2 * 1200) + (1 * 2000); // 4400
+        double tax = subtotal * 0.19;              // 836
+        double total = subtotal + tax;             // 5236
 
         CreateOrderResponse actualOrderResponse = orderService.createOrder(orderServiceRequest);
+
+        CreateOrderResponse expectedOrderResponse = new CreateOrderResponse(
+                actualOrderResponse.orderId(),
+                new CustomerName("Santiago Franco"),
+                new EmailAddress("santiago@gmail.com"),
+                new Address("123 Main street", "New york", "Colombia"),
+                itemsValueObject,
+                new PaymentMethod(PaymentMethods.CARD),
+                total
+        );
 
         Assertions.assertNotNull(actualOrderResponse);
         Assertions.assertEquals(expectedOrderResponse, actualOrderResponse);
     }
 
     @Test
-    public void shouldFail_whenFieldsProvidedWereWrong(){
-        List<OrderItemRequest> items = List.of(new OrderItemRequest("id-1", 0, -1200), new OrderItemRequest("id-2", 1, 2000));
+    public void shouldFail_whenEmailIsWrong(){
+        List<OrderItemRequest> items = List.of(
+                new OrderItemRequest("id-1", 2, 1200),
+                new OrderItemRequest("id-2", 1, 2000)
+        );
+
+        CreateOrderRequest orderServiceRequest = new CreateOrderRequest(
+                "Santiago Franco",
+                "santiagogmail.com",
+                "123 Main street",
+                "New york",
+                "Colombia",
+                items,
+                PaymentMethods.CARD
+        );
+
+        IllegalArgumentException exception = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.createOrder(orderServiceRequest)
+        );
+    }
+
+    @Test
+    public void shouldFail_WhenCustomerNameIsNull(){
+        List<OrderItemRequest> items = List.of(
+                new OrderItemRequest("id-1", 2, 1200),
+                new OrderItemRequest("id-2", 1, 2000)
+        );
+
         CreateOrderRequest orderServiceRequest = new CreateOrderRequest(
                 null,
                 "santiagogmail.com",
@@ -65,12 +103,13 @@ class OrderServiceTest {
                 "New york",
                 "Colombia",
                 items,
-                PaymentMethods.CASH
+                PaymentMethods.CARD
+        );
+
+        NullPointerException exception = Assertions.assertThrows(
+                NullPointerException.class,
+                () -> orderService.createOrder(orderServiceRequest)
         );
     }
-
-    @Test
-    public void shouldFailInOrderCreationByPaymentMethodValidation(){
-
-    }
 }
+
